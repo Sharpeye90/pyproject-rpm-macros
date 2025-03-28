@@ -1,17 +1,14 @@
+%if 0%{?el8} || 0%{?redos}
+%global el_python3_pkgversion 3
+%else
+%global el_python3_pkgversion 36
+%endif
+
 Name:           pyproject-rpm-macros
 Summary:        RPM macros for PEP 517 Python packages
-License:        MIT
-
-%bcond_with tests
-
-# The idea is to follow the spirit of semver
-# Given version X.Y.Z:
-#   Increment X and reset Y.Z when there is a *major* incompatibility
-#   Increment Y and reset Z when new macros or features are added
-#   Increment Z when this is a bugfix or a cosmetic change
-# Dropping support for EOL Fedoras is *not* considered a breaking change
 Version:        1.3.2
-Release:        1.1%{?dist}
+Release:        1.ROCKI2%{?dist}
+License:        MIT
 
 # Macro files
 Source001:      macros.pyproject
@@ -25,41 +22,16 @@ Source105:      pyproject_construct_toxenv.py
 Source106:      pyproject_requirements_txt.py
 Source107:      pyproject_wheel.py
 
-# Tests
-Source201:      test_pyproject_buildrequires.py
-Source202:      test_pyproject_save_files.py
-Source203:      test_pyproject_requirements_txt.py
-Source204:      compare_mandata.py
-
-# Test data
-Source301:      pyproject_buildrequires_testcases.yaml
-Source302:      pyproject_save_files_test_data.yaml
-Source303:      test_RECORD
-
-# Metadata
-Source901:      README.md
-Source902:      LICENSE
-
 URL:            https://src.fedoraproject.org/rpms/pyproject-rpm-macros
 
 BuildArch:      noarch
 
-%if %{with tests}
-BuildRequires: python3dist(pytest)
-BuildRequires: python3dist(pyyaml)
-BuildRequires: python3dist(packaging)
-BuildRequires: python3dist(pip)
-BuildRequires: python3dist(setuptools)
-BuildRequires: python3dist(tox-current-env) >= 0.0.6
-BuildRequires: python3dist(wheel)
-BuildRequires: (python3dist(toml) if python3-devel < 3.11)
-%endif
 
 # We build on top of those:
 Requires:      python-rpm-macros
 Requires:      python-srpm-macros
 Requires:      python3-rpm-macros
-Requires:      python3-importlib-metadata
+Requires:      python%{el_python3_pkgversion}-importlib-metadata
 
 # We use the following tools outside of coreutils
 Requires:      /usr/bin/find
@@ -101,16 +73,6 @@ install -m 644 pyproject_construct_toxenv.py %{buildroot}%{_rpmconfigdir}/redhat
 install -m 644 pyproject_requirements_txt.py %{buildroot}%{_rpmconfigdir}/redhat/
 install -m 644 pyproject_wheel.py %{buildroot}%{_rpmconfigdir}/redhat/
 
-%if %{with tests}
-%check
-export HOSTNAME="rpmbuild"  # to speedup tox in network-less mock, see rhbz#1856356
-%{python3} -m pytest -vv --doctest-modules
-
-# brp-compress is provided as an argument to get the right directory macro expansion
-%{python3} compare_mandata.py -f %{_rpmconfigdir}/brp-compress
-%endif
-
-
 %files
 %{_rpmmacrodir}/macros.pyproject
 %{_rpmconfigdir}/redhat/pyproject_buildrequires.py
@@ -120,9 +82,6 @@ export HOSTNAME="rpmbuild"  # to speedup tox in network-less mock, see rhbz#1856
 %{_rpmconfigdir}/redhat/pyproject_construct_toxenv.py
 %{_rpmconfigdir}/redhat/pyproject_requirements_txt.py
 %{_rpmconfigdir}/redhat/pyproject_wheel.py
-
-%doc README.md
-%license LICENSE
 
 %changelog
 * Thu Jun 30 2022 Alfredo Moralejo <amoralej@redhat.com> - 1.3.2-1.1
