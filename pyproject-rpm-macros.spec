@@ -2,12 +2,13 @@
 %global el_python3_pkgversion 3
 %else
 %global el_python3_pkgversion 36
+%global _rpmmacrodir /usr/lib/rpm/macros.d
 %endif
 
 Name:           pyproject-rpm-macros
 Summary:        RPM macros for PEP 517 Python packages
 Version:        1.3.2
-Release:        1.ROCKI2%{?dist}
+Release:        1.ROCKI3%{?dist}
 License:        MIT
 
 # Macro files

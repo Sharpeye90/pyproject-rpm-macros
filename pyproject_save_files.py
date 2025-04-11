@@ -118,7 +118,7 @@ def pycached(script, python_version):
     """
     assert script.suffix == ".py"
     pyver = "".join(python_version.split(".")[:2])
-    pycname = f"{script.stem}.cpython-{pyver}{{,.opt-?}}.pyc"
+    pycname = f"{script.stem}.cpython-{pyver}.pyc"
     pyc = pycache_dir(script) / pycname
     return [script, pyc]
 
